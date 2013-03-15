@@ -80,7 +80,9 @@ class IonicClient:
             for x in file.readlines():
                 send.send(x)
         send.close()
+        print "Done sending", file
     def get(self, file):
+        print "Downloading", file
         get = socket.socket()
         try:
             get.connect((self.ip, self.port))
@@ -94,6 +96,7 @@ class IonicClient:
                     get.close()
                     break
                 name.write(data)
+        print "Done downloading", file
     def delete(self, file):
         if file == sys.argv[0]:
             print "You can not delete Ionic Backup Client"

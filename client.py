@@ -75,7 +75,7 @@ class IonicClient:
         print "sending", file
         send = socket.socket()
         send.connect((self.ip, self.port))
-        send.send("send "+file)
+        send.send("send "+file+"\n\r\n\r")
         with open(file, 'rb') as file:
             for x in file.readlines():
                 send.send(x)

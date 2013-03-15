@@ -22,7 +22,6 @@ class IonicServer:
             self.obj = obj
             data = obj.recv(1024)
             self.data = data
-            print con[0], data
             if not data:
                 return 1
             else:

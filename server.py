@@ -59,7 +59,10 @@ class IonicServer:
     def senddir(self):
         dir = self.data.split()[1]
         if not os.path.exists(dir):
-            os.mkdir(dir)
+            try:
+                os.mkdir(dir)
+            except:
+                pass
     def list(self):
         files = []
         dirs = []
@@ -79,4 +82,7 @@ class IonicServer:
         files.remove(sys.argv[0])
         self.obj.send(str(dirs)+":"+str(files))
 if __name__ == "__main__":
-    IonicServer().main()
+    try:
+        IonicServer().main()
+    except IndexError:
+        print "Usage: python server.py <port>"

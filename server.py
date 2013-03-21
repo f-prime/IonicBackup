@@ -1,5 +1,6 @@
-import socket, os, sys
-
+import socket, os, sys, thread
+import SimpleHTTPServer as simp
+import SocketServer
 class IonicServer:
     def __init__(self):
         self.port = int(sys.argv[1])
@@ -16,7 +17,7 @@ class IonicServer:
         self.sock = socket.socket()
         self.sock.bind(('', self.port))
         self.sock.listen(1)
-        print "Ionic Backup Has Started."
+        print "\nIonic Backup Has Started.\n"
         while True:
             obj,con = self.sock.accept()
             self.obj = obj
@@ -81,8 +82,18 @@ class IonicServer:
                     pass
         files.remove(sys.argv[0])
         self.obj.send(str(dirs)+":"+str(files))
+def http_server():
+    port = 5643
+    handle = simp.SimpleHTTPRequestHandler
+    httpd = SocketServer.TCPServer(('', port), handle)
+    print "HTTP server started on port "+ str(port)
+    httpd.serve_forever()
+
 if __name__ == "__main__":
     try:
+        if len(sys.argv) > 2:
+            if sys.argv[2] == 'http':
+                thread.start_new_thread(http_server, ())
         IonicServer().main()
     except IndexError:
         print "Usage: python server.py <port>"

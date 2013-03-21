@@ -1,3 +1,10 @@
+Update
+======
+
+Added HTTP Server to view files remotely without the need for the IonicDB client.
+
+To start with HTTP server: python server.py <port> http
+
 About
 =====
 

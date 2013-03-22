@@ -1,4 +1,4 @@
-import socket, os, time, sys, threading
+import socket, os, time, sys, thread
 
 class IonicClient:
     def __init__(self, ip, port):
@@ -155,7 +155,11 @@ def shell(ip, port):
             print "Files: \n"+'\n'.join(eval(stuff[1]))
 
 if __name__ == "__main__":
-    ip = raw_input("IP: ")
-    port = input("Port: ")
-    threading.Thread(target=shell, args=(ip, port)).start()
-    IonicClient(ip, port).main()
+    try:
+        ip = sys.argv[1]
+        port = int(sys.argv[2])
+    except IndexError:
+        print "Usage: python client.py <ip> <port>"
+    else:
+        thread.start_new_thread(shell, (ip, port))
+        IonicClient(ip, port).main()

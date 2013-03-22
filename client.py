@@ -12,7 +12,7 @@ class IonicClient:
                     continue
                 with open(x+"/"+b, 'rb') as file:
                     self.files[b.strip("/")] = hash(file.read())
-        
+
     def main(self):
         while True:
             time.sleep(1)
@@ -24,10 +24,13 @@ class IonicClient:
                     os.mkdir(x.strip("/"))
                     self.dirs.append(x)
             for x in file:
-                if not os.path.exists(x):
+                if not os.path.exists(x) and x not in self.files:
                     self.get(x)
                     with open(x, 'rb') as f:
                         self.files[x] = hash(f.read())
+                if not os.path.exists(x) and x in self.files:
+                    self.delete(x)
+                    del self.files[x]
             for x,y,z in os.walk(os.getcwd()):
                 for d in y:
                     direc = x.strip(os.getcwd())+"/"+d
@@ -53,7 +56,7 @@ class IonicClient:
                                 self.send(file_c)
                                 with open(file_c, 'rb') as f:
                                     self.files[file_c] = hash(f.read())
-                    
+            
     def senddir(self, direc):
         senddir = socket.socket()
         try:

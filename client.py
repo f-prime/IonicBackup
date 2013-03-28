@@ -58,78 +58,98 @@ class IonicClient:
                                     self.files[file_c] = hash(f.read())
             
     def senddir(self, direc):
-        senddir = socket.socket()
         try:
-            senddir.connect((self.ip, self.port))
-        except:
-            print "Could not connect to server."
-        senddir.send("senddir "+direc)
-        senddir.close()
-    def list(self):
-        list = socket.socket()
-        try:
-            list.connect((self.ip, self.port))
-        except:
-            print "Could not connect to server."
-        list.send("list")
-        return list.recv(1024)
-        list.close()
-    def send(self, file):
-        print "sending", file
-        send = socket.socket()
-        send.connect((self.ip, self.port))
-        send.send("send "+file+"\n\r\n\r")
-        with open(file, 'rb') as file:
-            for x in file.readlines():
-                send.send(x)
-            print "Done sending", file
-        send.close()
-    def get(self, file):
-        print "Downloading", file
-        get = socket.socket()
-        try:
-            get.connect((self.ip, self.port))
-        except:
-            print "Could not connect to server"
-        get.send("get "+file)
-        with open(file, 'wb') as name:
-            while True:
-                data = get.recv(1024)
-                if not data:
-                    print "Done downloading", file
-                    get.close()
-                    break
-                name.write(data)
-    def delete(self, file):
-        if file == sys.argv[0]:
-            print "You can not delete Ionic Backup Client"
-        else:
+            senddir = socket.socket()
             try:
-                os.remove(file)
-            except:
-                print "File doesn't exist"
-
-            delete = socket.socket()
-            try:
-                delete.connect((self.ip, self.port))
+                senddir.connect((self.ip, self.port))
             except:
                 print "Could not connect to server."
-            delete.send("del "+file)
-            delete.close()
+            senddir.send("senddir "+direc)
+            senddir.close()
+        except Exception, error:
+            print error
+    def list(self):
+        try:
+            list = socket.socket()
+            try:
+                list.connect((self.ip, self.port))
+            except:
+                print "Could not connect to server."
+            list.send("list")
+            return list.recv(1024)
+            list.close()
+        except Exception, error:
+            print error
+
+    def send(self, file):
+        try:
+            print "sending", file
+            send = socket.socket()
+            send.connect((self.ip, self.port))
+            send.send("send "+file+"\n\r\n\r")
+            with open(file, 'rb') as file:
+                for x in file.readlines():
+                    send.send(x)
+                print "Done sending", file
+            send.close()
+        except Exception, error:
+            print error
+
+    def get(self, file):
+        try:
+            print "Downloading", file
+            get = socket.socket()
+            try:
+                get.connect((self.ip, self.port))
+            except:
+                print "Could not connect to server"
+            get.send("get "+file)
+            with open(file, 'wb') as name:
+                while True:
+                    data = get.recv(1024)
+                    if not data:
+                        print "Done downloading", file
+                        get.close()
+                        break
+                    name.write(data)
+        except Exception, error:
+            print error
+
+    def delete(self, file):
+        try:
+            if file == sys.argv[0]:
+                print "You can not delete Ionic Backup Client"
+            else:
+                try:
+                    os.remove(file)
+                except:
+                    print "File doesn't exist"
+
+                delete = socket.socket()
+                try:
+                    delete.connect((self.ip, self.port))
+                except:
+                    print "Could not connect to server."
+                delete.send("del "+file)
+                delete.close()
+        except Exception, error:
+            print error
     def delete_dir(self, file):
         try:
-            os.rmdir(file)
-        except:
-            print "Directory doesn't exist"
-        deldir = socket.socket()
-        try:
-            deldir.connect((self.ip, self.port))
-        except:
-            print "Could not connect to server."
-        
-        deldir.send("deldir "+file)
-        deldir.close()
-
+            try:
+                os.rmdir(file)
+            except:
+                print "Directory doesn't exist"
+            deldir = socket.socket()
+            try:
+                deldir.connect((self.ip, self.port))
+            except:
+                print "Could not connect to server."
+            
+            deldir.send("deldir "+file)
+            deldir.close()
+        except Exception, error:
+            print error
 def shell(ip, port):
     while True:
         cmd = raw_input("IonicShell> ")

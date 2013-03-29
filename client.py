@@ -72,7 +72,13 @@ class IonicClient:
         except:
             print "Could not connect to server."
         list.send("list")
-        return list.recv(1024)
+        data = ''
+        while True:
+            d = list.recv(1024)
+            data = data + d
+            if not d:
+                break
+        return data
         list.close()
     def send(self, file):
         print "sending", file

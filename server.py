@@ -27,8 +27,10 @@ class IonicServer:
                 return 1
             else:
                 data = data.split()
-                self.commands[data[0]]()
-
+                try:
+                    self.commands[data[0]]()
+                except Exception, error:
+                    print error
     def get(self):
         data = self.data.split()[1]
         with open(data, 'rb') as file:
@@ -81,7 +83,10 @@ class IonicServer:
                 except:
                     pass
         files.remove(sys.argv[0])
-        self.obj.send(str(dirs)+":"+str(files))
+        data = str(dirs)+":"+str(files)
+        for x in data:
+            self.obj.send(x)
+        self.obj.close()
 def http_server():
     port = 5643
     handle = simp.SimpleHTTPRequestHandler

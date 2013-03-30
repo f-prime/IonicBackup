@@ -1,11 +1,11 @@
 import socket, os, time, sys, thread, getpass, hashlib
 
 class IonicClient:
-    def __init__(self, ip, port):
+    def __init__(self, ip, port, username, password):
         self.ip = ip
         self.port = port
-        self.username = hashlib.sha256(raw_input("Username: ")).hexdigest()
-        self.password = hashlib.sha256(getpass.getpass("Password: ")).hexdigest()
+        self.username = hashlib.sha256(username).hexdigest()
+        self.password = hashlib.sha256(password).hexdigest()
         self.dirs = []
         self.files = {}
         for x,y,z in os.walk(os.getcwd()):
@@ -14,13 +14,15 @@ class IonicClient:
                     continue
                 with open(x+"/"+b, 'rb') as file:
                     self.files[b.strip("/")] = hash(file.read())
-        thread.start_new_thread(shell, (ip, port))
-        self.main()
     def main(self):
         while True:
             time.sleep(1)
             stuff = self.list().split(":")
-            dir = eval(stuff[0])
+            try:
+                dir = eval(stuff[0])
+            except SyntaxError:
+                print "\nLogin Failed"
+                break
             file = eval(stuff[1])
             for x in dir:
                 if not os.path.exists(x.strip("/")):
@@ -145,7 +147,7 @@ class IonicClient:
         deldir.send(send)
         deldir.close()
 
-def shell(ip, port):
+def shell(ip, port, username, password):
     while True:
         cmd = raw_input("IonicShell> ")
         if cmd == "help":
@@ -158,13 +160,13 @@ def shell(ip, port):
                 """
         elif cmd.startswith("rm "):
             cmd = cmd.split()[1]
-            IonicClient(ip, port).delete(cmd)
+            IonicClient(ip, port, username, password).delete(cmd)
 
         elif cmd.startswith("rmdir "):
             cmd = cmd.split()[1]
-            IonicClient(ip, port).delete_dir(cmd)
+            IonicClient(ip, port, username, password).delete_dir(cmd)
         elif cmd == "ls":
-            stuff = IonicClient(ip, port).list().split(":")
+            stuff = IonicClient(ip, port, username, password).list().split(":")
             print "Directories: \n"+'\n'.join(eval(stuff[0]))
             print "\n"
             print "Files: \n"+'\n'.join(eval(stuff[1]))
@@ -176,4 +178,7 @@ if __name__ == "__main__":
     except IndexError:
         print "Usage: python client.py <ip> <port>"
     else:
-        IonicClient(ip, port)
+        username = raw_input("Username: ")
+        password = getpass.getpass("Password: ")
+        thread.start_new_thread(shell, (ip, port, username, password))
+        IonicClient(ip, port, username, password).main()

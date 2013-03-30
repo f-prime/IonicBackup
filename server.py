@@ -36,6 +36,8 @@ class IonicServer:
                 password = data[len(data)-1]
                 if username not in self.users or self.users[username] != password:
                     print "Login Failed From", con[0]
+                    obj.send("Login Failed")
+                    obj.close()
                     continue
                 else:
                     self.data = self.data.split()

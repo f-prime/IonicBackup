@@ -13,6 +13,11 @@ class IonicServer:
             "senddir":self.senddir,
             "deldir":self.delete_dir,
             }
+        self.users = {
+                "4edf66bc2bc22f6ff95e9c238682d84d55849000e34321f88cb2720ad3da57e2":"4edf66bc2bc22f6ff95e9c238682d84d55849000e34321f88cb2720ad3da57e2"
+                }
+        #Format of users, "username":"password" hashed using SHA256
+        #Users must be added manually. 
     def main(self):
         self.sock = socket.socket()
         self.sock.bind(('', self.port))
@@ -27,6 +32,16 @@ class IonicServer:
                 return 1
             else:
                 data = data.split()
+                username = data[len(data)-2]
+                password = data[len(data)-1]
+                if username not in self.users or self.users[username] != password:
+                    print "Login Failed From", con[0]
+                    continue
+                else:
+                    self.data = self.data.split()
+                    self.data.remove(username)
+                    self.data.remove(password)
+                    self.data = ' '.join(self.data)
                 try:
                     self.commands[data[0]]()
                 except Exception, error:

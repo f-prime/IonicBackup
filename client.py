@@ -1,9 +1,11 @@
-import socket, os, time, sys, thread
+import socket, os, time, sys, thread, getpass, hashlib
 
 class IonicClient:
     def __init__(self, ip, port):
         self.ip = ip
         self.port = port
+        self.username = hashlib.sha256(raw_input("Username: ")).hexdigest()
+        self.password = hashlib.sha256(getpass.getpass("Password: ")).hexdigest()
         self.dirs = []
         self.files = {}
         for x,y,z in os.walk(os.getcwd()):
@@ -12,7 +14,8 @@ class IonicClient:
                     continue
                 with open(x+"/"+b, 'rb') as file:
                     self.files[b.strip("/")] = hash(file.read())
-
+        thread.start_new_thread(shell, (ip, port))
+        self.main()
     def main(self):
         while True:
             time.sleep(1)
@@ -63,7 +66,8 @@ class IonicClient:
             senddir.connect((self.ip, self.port))
         except:
             print "Could not connect to server."
-        senddir.send("senddir "+direc)
+        send = "senddir {0} {1} {2}".format(direc, self.username, self.password)
+        senddir.send(send)
         senddir.close()
     def list(self):
         list = socket.socket()
@@ -71,7 +75,8 @@ class IonicClient:
             list.connect((self.ip, self.port))
         except:
             print "Could not connect to server."
-        list.send("list")
+        send = "list {0} {1}".format(self.username, self.password)
+        list.send(send)
         data = ''
         while True:
             d = list.recv(1024)
@@ -84,7 +89,8 @@ class IonicClient:
         print "sending", file
         send = socket.socket()
         send.connect((self.ip, self.port))
-        send.send("send "+file+"\n\r\n\r")
+        sends = "send {0} {1} {2}\r\n\r\n".format(file, self.username, self.password)
+        send.send(sends)
         with open(file, 'rb') as file_:
             for x in file_.readlines():
                 send.send(x)
@@ -97,7 +103,8 @@ class IonicClient:
             get.connect((self.ip, self.port))
         except:
             print "Could not connect to server"
-        get.send("get "+file)
+        send = "get {0} {1} {2}".format(file, self.username, self.password)
+        get.send(send)
         with open(file, 'wb') as name:
             while True:
                 data = get.recv(1024)
@@ -120,7 +127,8 @@ class IonicClient:
                 delete.connect((self.ip, self.port))
             except:
                 print "Could not connect to server."
-            delete.send("del "+file)
+            send = "del {0} {1} {2}".format(file, self.username, self.password)
+            delete.send(send)
             delete.close()
     def delete_dir(self, file):
         try:
@@ -133,7 +141,8 @@ class IonicClient:
         except:
             print "Could not connect to server."
         
-        deldir.send("deldir "+file)
+        send = "deldir {0} {1} {2}".format(file, self.username, self.password)
+        deldir.send(send)
         deldir.close()
 
 def shell(ip, port):
@@ -167,5 +176,4 @@ if __name__ == "__main__":
     except IndexError:
         print "Usage: python client.py <ip> <port>"
     else:
-        thread.start_new_thread(shell, (ip, port))
-        IonicClient(ip, port).main()
+        IonicClient(ip, port)

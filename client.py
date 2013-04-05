@@ -16,57 +16,56 @@ class IonicClient:
                     self.files[b.strip("/")] = hash(file.read())
     def main(self):
         while True:
-            time.sleep(1)
             try:
+                time.sleep(1)
                 stuff = self.list().split(":")
-            except:
-                print "Could not connect to server, waiting 1 minute to try again."
-                time.sleep(60)
-                continue
-            try:
-                dir = eval(stuff[0])
-            except SyntaxError:
-                print "\nLogin Failed"
-                break
-            file = eval(stuff[1])
-            for x in dir:
-                if not os.path.exists(x.strip("/")):
-                    os.mkdir(x.strip("/"))
-                    self.dirs.append(x)
-            for x in file:
-                if not os.path.exists(x) and x not in self.files:
-                    self.get(x)
-                    with open(x, 'rb') as f:
-                        self.files[x] = hash(f.read())
-                if not os.path.exists(x) and x in self.files:
-                    self.delete(x)
-                    del self.files[x]
-            for x,y,z in os.walk(os.getcwd()):
-                for d in y:
-                    direc = x.strip(os.getcwd())+"/"+d
-                    direc = direc.strip("/")
-                    if direc not in self.dirs:
-                        self.dirs.append(direc)
-                    if direc not in dir:
-                        self.senddir(direc)
-                for f in z:
-                    file_c = x +"/"+ f
-                    file_c = file_c.replace(os.getcwd(), '').strip("/")
-                    if file_c == sys.argv[0]:
-                        continue
-                    if file_c in self.files and file_c not in file:
-                        self.send(file_c)
-                    elif file_c not in self.files and file_c not in file:
-                        with open(file_c, 'rb') as f:
-                            self.files[file_c] = hash(f.read())
-                        self.send(file_c)
-                    elif file_c in self.files and file_c in file:
-                        with open(file_c, 'rb') as f:
-                            if hash(f.read()) != self.files[file_c]:
-                                self.send(file_c)
-                                with open(file_c, 'rb') as f:
-                                    self.files[file_c] = hash(f.read())
-            
+                try:
+                    dir = eval(stuff[0])
+                except SyntaxError:
+                    print "\nLogin Failed"
+                    break
+                file = eval(stuff[1])
+                for x in dir:
+                    if not os.path.exists(x.strip("/")):
+                        os.mkdir(x.strip("/"))
+                        self.dirs.append(x)
+                for x in file:
+                    if not os.path.exists(x) and x not in self.files:
+                        self.get(x)
+                        with open(x, 'rb') as f:
+                            self.files[x] = hash(f.read())
+                    if not os.path.exists(x) and x in self.files:
+                        self.delete(x)
+                        del self.files[x]
+                for x,y,z in os.walk(os.getcwd()):
+                    for d in y:
+                        direc = x.strip(os.getcwd())+"/"+d
+                        direc = direc.strip("/")
+                        if direc not in self.dirs:
+                            self.dirs.append(direc)
+                        if direc not in dir:
+                            self.senddir(direc)
+                    for f in z:
+                        file_c = x +"/"+ f
+                        file_c = file_c.replace(os.getcwd(), '').strip("/")
+                        if file_c == sys.argv[0]:
+                            continue
+                        if file_c in self.files and file_c not in file:
+                            self.send(file_c)
+                        elif file_c not in self.files and file_c not in file:
+                            with open(file_c, 'rb') as f:
+                                self.files[file_c] = hash(f.read())
+                            self.send(file_c)
+                        elif file_c in self.files and file_c in file:
+                            with open(file_c, 'rb') as f:
+                                if hash(f.read()) != self.files[file_c]:
+                                    self.send(file_c)
+                                    with open(file_c, 'rb') as f:
+                                        self.files[file_c] = hash(f.read())
+            except Exception, error:
+                print error
+                print "\n Could not connect to server, trying again."
+                time.sleep(1)
     def senddir(self, direc):
         senddir = socket.socket()
         try:

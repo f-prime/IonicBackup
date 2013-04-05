@@ -17,7 +17,12 @@ class IonicClient:
     def main(self):
         while True:
             time.sleep(1)
-            stuff = self.list().split(":")
+            try:
+                stuff = self.list().split(":")
+            except:
+                print "Could not connect to server, waiting 1 minute to try again."
+                time.sleep(60)
+                continue
             try:
                 dir = eval(stuff[0])
             except SyntaxError:
